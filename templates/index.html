@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Show Image</title>
+    <style>
+        /* Styling the image display */
+        #imagePreview {
+            margin-top: 20px;
+            max-width: 50%;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Color Palette Generator</h1>
+
+    <!-- File Input for Uploading Image -->
+    <form id="imageForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" id="imageUpload" name="image" accept="image/*" required>
+        <button type="submit">Process</button>
+    </form>
+
+    <!-- Display Uploaded Image Preview -->
+    <img id="imagePreview" src="" alt="Uploaded Image Preview" style="display:none;">
+
+    <!-- Display Generated Color Palette Image -->
+    {% if color_palette %}
+    <!-- Display source image -->
+        <img src="{{ url_for('static', filename='assets/img/' ~ filename) }}" alt="Source image" style="margin-top: 20px; max-width: 50%; max-height: 200px; display: block;">
+        <h2>Top 10 Prominent Colors</h2>
+    <!-- Display the generated color palette image -->
+        <img src="{{ url_for('static', filename='assets/img/color_palette.png') }}" alt="Generated Palette Preview" style="display: block;">
+    <!-- Loop through color_list to display each color -->
+        {% for item in color_list %}
+            {% if (item != 'No exact color name found') and (item != 'white') %}
+                <h4 style="color: {{ item }};">{{ loop.index }}. {{ item }}</h4>
+            {% else %}
+                <h4 style="color: black;">{{ loop.index }}. {{ item }}</h4>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <script>
+        // Get file input and image element
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Add event listener to handle file input change
+        imageUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];  // Get the file
+
+            // If a file is selected
+            if (file) {
+                // Create a FileReader to read the file
+                const reader = new FileReader();
+
+                // On file load, set the image preview
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;  // Set the image source
+                    imagePreview.style.display = 'block';  // Make the image visible
+                };
+
+                // Read the image file as Data URL
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
